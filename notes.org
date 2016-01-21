@@ -1,0 +1,139 @@
+* Краткая история
+- 2009-2010 проект перешел в Mozilla
+- 2015 релиз 1.0
+  - 1.0 означает отсутствие breaking changes (в идеале :-)
+- текущий stable 1.5
+- первые версии компилятора были написаны на OCaml
+  (но давно уже self-hosted)
+- развивался параллельно с Mozilla Servo
+  (экспериментальный броузерный layout/rendering engine)
+* Предназначение
+- memory safety without garbage collection
+  - статический анализ
+  - отсутствие undefined behaviour
+- concurrency without data races
+  - как следствие ownership+borrowing 
+- zero-cost abstractions
+  - не платишь за то, что не используешь
+  - высокоуровневые констукции превращаются в обычный код,
+    сопоставимый с обычным C
+  - по синтетическим benchmark где-то между C и C++.
+    Cтандартная библиотека пока не особо оптимизирована
+* Интересное 
+- ownership - кто отвечат за данные
+  - alloc/free, move
+  - пример
+    #+INCLUDE: "./examples/main/ownership.rs" src rust
+- borrowing/references - временное владение данными
+  - & и &mut
+  - закрывает целую кучу проблем, в т.ч.:
+    - iterator invalidation
+    - use after free
+- lifetimes - сколько живут данные
+  - часть типа
+  - может ограничиваться в generic'ах
+  - один специальный lifetime: 'static
+  - иногда надо помогать компилятору для их определения
+  - пример
+    #+INCLUDE: "./examples/main/lifetimes.rs" src rust
+* Прочие особенности
+- язык "системного программирования" в том смысле,
+  что можно написать ядро, модуль ядра и т.п.
+- вместо традиционного ООП предлагается система типов
+  основанная на структурах, перечислениях (ADT, aka sum types) и trait'ах
+- generics
+- pattern matching
+- type inference
+- лямбды-замыкания, функции высшего порядка
+- перегрузка операторов (в ограниченном виде)
+- макросы (гигиеничные, по AST)
+- плагины к компилятору (syntax ext., lints)
+- условная сборка (почти как #define/#ifdef в Си)
+- стандартная библиотека: "маленькая, но хорошая" (c)
+- threads, channels
+- взаимодействие с Си в обе стороны
+- inline asm
+- нормальные сообщения об ошибках
+* Примеры
+- hello, world
+  #+INCLUDE: "./examples/hello.rs" src rust
+- functions
+  #+INCLUDE: "./examples/fns.rs" src rust
+- mutability
+  #+INCLUDE: "./examples/mut1.rs" src rust
+  #+INCLUDE: "./examples/mut2.rs" src rust
+- structs
+  #+INCLUDE: "./examples/struct.rs" src rust
+- ownership
+  #+INCLUDE: "./examples/owner.rs" src rust
+  #+INCLUDE: "./examples/owner2.rs" src rust
+  #+INCLUDE: "./examples/owner3.rs" src rust
+- match
+  #+INCLUDE: "./examples/match.rs" src rust
+- enums
+  #+INCLUDE: "./examples/enums.rs" src rust
+- errors
+  #+INCLUDE: "./examples/errors.rs" src rust
+  #+INCLUDE: "./examples/errors2.rs" src rust
+  #+INCLUDE: "./examples/errors3.rs" src rust
+  #+INCLUDE: "./examples/errors4.rs" src rust
+  #+INCLUDE: "./examples/errors5.rs" src rust
+- traits
+  #+INCLUDE: "./examples/traits.rs" src rust
+- iterators
+  #+INCLUDE: "./examples/iter.rs" src rust
+  #+INCLUDE: "./examples/iter2.rs" src rust
+  #+INCLUDE: "./examples/iter3.rs" src rust
+  - в ASM для iter4.rs можно увидеть, как LLVM
+    оптимизировал программу сразу до итогового
+    значения:
+    #+BEGIN_SRC bash
+    $ rustc --emit=asm -O iter4.rs
+    $ cat iter4.s
+    ...
+  	movl	$45, %edi
+    callq	_ZN7process4exit20h6c4f863c37f7195dKAmE@PLT
+    ...
+    #+END_SRC
+  - как пример векторизации:
+    #+BEGIN_SRC bash
+    $ rustc --emit=asm -O sse.rs
+    $ cat sse.s
+    ...
+    movdqu	-48(%r14,%rax,4), %xmm3
+	  movdqu	-32(%r14,%rax,4), %xmm4
+	  movdqu	-48(%rbx,%rax,4), %xmm2
+	  movdqu	-32(%rbx,%rax,4), %xmm5
+	  pshufd	$245, %xmm2, %xmm6
+	  pmuludq	%xmm3, %xmm2
+	  pshufd	$232, %xmm2, %xmm2
+	  pshufd	$245, %xmm3, %xmm3
+	  pmuludq	%xmm6, %xmm3
+    ...
+    #+END_SRC
+- strings
+  #+INCLUDE: "./examples/str.rs" src rust
+- macros
+  #+INCLUDE: "./examples/macros.rs" src rust
+- threads
+  #+INCLUDE: "./examples/threads.rs" src rust
+  #+INCLUDE: "./examples/threads2.rs" src rust
+- channels
+  #+INCLUDE: "./examples/channels.rs" src rust
+* Окружение
+** Документация
+- "rustdoc" a-la "javadoc"
+- users.rust-lang.org, stackoverflow, IRC
+** Сборка
+- "cargo" a-la "maven"
+- центральный репозиторий crates.io
+** Отладка
+- gdb, lldb
+- rr
+** Профилирование 
+- valgrind, callgrind
+- perf, operf
+** IDE
+- vim, emacs
+- idea, eclipse
+- atom, textmate

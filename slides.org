@@ -1,0 +1,43 @@
+* Rust
+- с 2009 в Mozilla
+- 1.0 в 2015
+- текущий stable 1.5
+- идет парой с Servo
+* Цели
+- memory safety без GC
+- отсутствие data races
+- zero-cost abstractions
+* Что отличает от других
+- ownership
+- borrowing
+- lifetimes
+* Особенности
+- язык системного программирования
+- structs, traits, enums (ADT)
+- generics
+- pattern matching
+- вывод типов
+- лямбды/замыкания
+- перегрузка операторов
+- макросы/плагины
+- unsafe, inline asm
+* Документация
+- rustdoc (как javadoc)
+- официальный reference, "the book"
+* Сборка
+- официальный сборщик "cargo":
+  - управление зависимостями
+  - запуск тестов
+  - "скриптование" на rust
+* IDE
+- vim, emacs
+- RustDT для Eclipse
+- плагин к Idea
+- etc
+* Отладка
+- gdb, lldb
+- RustDT как frontend к gdb
+* Профилирование
+- valgrind
+- perf
+- etc
